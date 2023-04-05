@@ -760,8 +760,8 @@ function hubFramework.Initialize()
 
 	setmetatable(toReturn, hubDef)
 
-	toReturn:newContextMenuButton("HM").MouseButton1Down:connect(toReturn:switchPage({Base = PAGES_HomePage}))
-	toReturn:newContextMenuButton("GM").MouseButton1Down:connect(toReturn:switchPage({Base = PAGES_SupportedGames}))
+	toReturn:newContextMenuButton("HM").MouseButton1Down:connect(function() toReturn:switchPage({Base = PAGES_HomePage}) end)
+	toReturn:newContextMenuButton("GM").MouseButton1Down:connect(function() toReturn:switchPage({Base = PAGES_SupportedGames}) end)
 
 	return toReturn
 end
@@ -1399,7 +1399,9 @@ end
 local hubMain = hubFramework.Initialize()
 -- universal
 local unvPage = hubMain:newPage()
-hubMain:newContextMenuButton("UNV").MouseButton1Down:Connect(hubMain:switchPage(unvPage))
+hubMain:newContextMenuButton("UNV").MouseButton1Down:Connect(function()
+	hubMain:switchPage(unvPage)
+end)
 local characterCat = unvPage:newCategory("Character")
 local cWSB = characterCat:newCheckbox("WalkSpeed Enabled")
 local cJPB = characterCat:newCheckbox("JumpPower Enabled")
@@ -1486,7 +1488,9 @@ if game.PlaceId == 537413528 then
 
 	local page = hubMain:newPage()
 	local contxb = hubMain:newContextMenuButton("BBFT")
-	contxb.MouseButton1Down:Connect(hubMain:switchPage(page))
+	contxb.MouseButton1Down:Connect(function()
+		hubMain:switchPage(page)
+	end)
 	-- General
 	local generalCategory = page:newCategory("General")
 	local noglue = generalCategory:newDropdown("Destroy glue")
@@ -1679,7 +1683,9 @@ elseif game.PlaceId == 850917308 then
 	local page = hubMain:newPage()
 	local general = page:newCategory("General")
 	local contxb = hubMain:newContextMenuButton("LB2")
-	contxb.MouseButton1Down:Connect(hubMain:switchPage(page))
+	contxb.MouseButton1Down:Connect(function()
+		hubMain:switchPage(page)
+	end)
 	local medHeal = general:newCheckbox("Meditation Heal")
 	local antiFreezeCB = general:newCheckbox("Anti-Freeze")
 	local infiniteStaminaOTP = general:newOneTimePressButton("Infinite Stamina")
@@ -2032,7 +2038,9 @@ if CHLX_DEBUG == true then
 	local testPage = hubMain:newPage()
 	local trashCategory = testPage:newCategory("Test1")
 	local contxBut = hubMain:newContextMenuButton("</>")
-	contxBut.MouseButton1Down:Connect(hubMain:switchPage(testPage))
+	contxBut.MouseButton1Down:Connect(function()
+		hubMain:switchPage(testPage)
+	end)
 	local chkbx = trashCategory:newCheckbox("Checkbox")
 
 	chkbx.OnCheckFunc = function()
