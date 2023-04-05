@@ -760,8 +760,12 @@ function hubFramework.Initialize()
 
 	setmetatable(toReturn, hubDef)
 
-	toReturn:newContextMenuButton("HM").MouseButton1Down:connect(function() toReturn:switchPage({Base = PAGES_HomePage}) end)
-	toReturn:newContextMenuButton("GM").MouseButton1Down:connect(function() toReturn:switchPage({Base = PAGES_SupportedGames}) end)
+	toReturn:newContextMenuButton("HM").MouseButton1Down:connect(function() 
+		toReturn:switchPage({Base = PAGES_HomePage}) 
+	end)
+	toReturn:newContextMenuButton("GM").MouseButton1Down:connect(function() 
+		toReturn:switchPage({Base = PAGES_SupportedGames}) 
+	end)
 
 	return toReturn
 end
