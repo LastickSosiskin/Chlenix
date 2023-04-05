@@ -19,8 +19,6 @@ local getGlobal = getgenv or function()
 	return _G -- когда надо будет всё перенести эту строчку надо убрать для безопасности
 end
 
---assert(fireTouchInterest, getSenv, hookFunction, hookMetaMethod, checkCaller, getNameCallMethod, newCClosure, syn, "EXP not supported!")
-
 if getGlobal().__CHLENIX ~= nil then return end
 local SYN = syn or {}
 local protectGui = SYN.protect_gui or defaultFunction
@@ -60,15 +58,6 @@ function createTween(twnObject, ts, easDir, easStl, twnSet)
 	local tweenInfo = TweenInfo.new(tonumber(ts), easStl, easDir)
 	return tweenService:Create(twnObject, tweenInfo, twnSet)
 end
-function reverseTable(tbl)
-	local a = #tbl
-	local output = {}
-	repeat 
-		table.insert(output, tbl[a])
-		a = a - 1
-	until a == 0
-	return output
-end
 function randomstring(len)
 	local length = len or math.random(20,40)
 	local str = ""
@@ -78,60 +67,108 @@ function randomstring(len)
 	return str
 end
 
-local Notifications = {}
-local CHLXBuilder = {
-	NotificationFramework = {firstNotifyPosYScale = 0.9}; -- попробывать 0.9
-	HubFramework = {};
-	General = {};
-}
+-- hub loader
+local LO_GUI = Instance.new("ScreenGui")
+local LO_Base = Instance.new("Frame")
+local LO_UICorner = Instance.new("UICorner")
+local LO_HubName = Instance.new("TextLabel")
+local LO_LoadHolder = Instance.new("Frame")
+local LO_Runner = Instance.new("Frame")
+local LO_UIListLayout = Instance.new("UIListLayout")
+local LO_UIPadding = Instance.new("UIPadding")
 
-local notifFramework = CHLXBuilder.NotificationFramework
-local hubFramework = CHLXBuilder.HubFramework
-local genralFramework = CHLXBuilder.General
+LO_GUI.Name = randomstring()
+LO_GUI.Parent = coreGui
+LO_GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+LO_GUI.ResetOnSpawn = false
 
--- Notifications
-notifFramework.Initialize = function()
-	local NF_GUI = Instance.new("ScreenGui")
-	local NF_NFHolder = Instance.new("Frame")
+LO_Base.Name = randomstring()
+LO_Base.Parent = LO_GUI
+LO_Base.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+LO_Base.Position = UDim2.new(0.5, 0, 0.90, 0)
+LO_Base.Size = UDim2.new(0, 250, 0, 40)
+LO_Base.AnchorPoint = Vector2.new(0.5, 0.5)
 
-	NF_GUI.Name = randomstring()
-	NF_GUI.Parent = coreGui--localPlayer.PlayerGui
-	NF_GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	NF_GUI.ResetOnSpawn = false
+LO_UICorner.CornerRadius = UDim.new(0, 3)
+LO_UICorner.Parent = LO_Base
 
-	NF_NFHolder.Name = randomstring()
-	NF_NFHolder.Parent = NF_GUI
-	NF_NFHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	NF_NFHolder.BackgroundTransparency = 1
-	NF_NFHolder.BorderSizePixel = 0
-	NF_NFHolder.ClipsDescendants = true
-	NF_NFHolder.Position = UDim2.new(0.813642442, 0, 0.0197963864, 0)
-	NF_NFHolder.Size = UDim2.new(0.178332582, 0, 0.961234152, 0)
-	protectGui(NF_GUI)
-	return NF_NFHolder
-end
+LO_HubName.Name = randomstring()
+LO_HubName.Parent = LO_Base
+LO_HubName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+LO_HubName.BackgroundTransparency = 1.000
+LO_HubName.BorderSizePixel = 2
+LO_HubName.Position = UDim2.new(0.0200959481, 0, 0, 0)
+LO_HubName.Size = UDim2.new(0, 238, 0, 16)
+LO_HubName.Font = Enum.Font.SourceSansBold
+LO_HubName.Text = "CHLENIX"
+LO_HubName.TextColor3 = Color3.fromRGB(255, 255, 255)
+LO_HubName.TextSize = 14.000
+LO_HubName.TextXAlignment = Enum.TextXAlignment.Left
+LO_HubName.LayoutOrder = 1
 
-notifFramework.calculateNotifyPos = function(notify, padding)
-	local index = table.find(Notifications, notify)
-	if index == 1 then
-		return UDim2.new(0, 0, CHLXBuilder.NotificationFramework.firstNotifyPosYScale, 0)
-	end
-	if index > 1 then
-		local posYScale = Notifications[index-1].Position.Y.Scale - tonumber("0."..Notifications[index-1].Size.Y.Offset * 1)--1.5) -- * 1.5 er
-		return UDim2.new(0, 0, posYScale, 0) -- попробывать всё на оффсет перестроить
-	end
-end
+LO_LoadHolder.Name = randomstring()
+LO_LoadHolder.Parent = LO_Base
+LO_LoadHolder.BackgroundColor3 = Color3.fromRGB(168, 17, 255)
+LO_LoadHolder.BorderSizePixel = 0
+LO_LoadHolder.ClipsDescendants = true
+LO_LoadHolder.Position = UDim2.new(0.0240000002, 0, 0.400000006, 0)
+LO_LoadHolder.Size = UDim2.new(0, 238, 0, 17)
+LO_LoadHolder.LayoutOrder = 2
 
-function notifFramework.notifyRepositon()
-	for i,v in pairs(Notifications) do
-		local pos = notifFramework.calculateNotifyPos(v, 0.15)
-		local daTween = createTween(v, 0.1, "In", "Sine", {Position = pos})
+LO_Runner.Name = randomstring()
+LO_Runner.Parent = LO_LoadHolder
+LO_Runner.BackgroundColor3 = Color3.fromRGB(104, 11, 158)
+LO_Runner.BorderSizePixel = 0
+LO_Runner.Size = UDim2.new(0, 60, 0, 17)
+LO_Runner.ZIndex = 3
+
+LO_UIListLayout.Parent = LO_Base
+LO_UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+LO_UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+LO_UIPadding.Parent = LO_Base
+LO_UIPadding.PaddingBottom = UDim.new(0, 5)
+LO_UIPadding.PaddingLeft = UDim.new(0, 5)
+LO_UIPadding.PaddingRight = UDim.new(0, 5)
+
+protectGui(LO_GUI)
+
+coroutine.resume(coroutine.create(function()
+	local LO_Debounce = 0
+	repeat
+		LO_Runner.Position = UDim2.new(-0.252, 0, 0, 0)
+		local daTween = createTween(LO_Runner, .7, "In", "Linear", {Position = UDim2.new(1, 0, 0, 0)})
 		daTween:Play()
 		daTween.Completed:Wait()
-	end
-end
+		LO_Debounce = LO_Debounce + 1
+	until LO_Debounce == 3 and isLoaded == true
+	createTween(LO_Base, .1, "In", "Sine", {Position = UDim2.new(0.5, 0, 1.1, 0), Transparency = 1}):Play()
+	wait(.1)
+	LO_GUI:Destroy()
+end))
 
-local NotificationHolder = notifFramework.Initialize()
+local CHLXBuilder = 
+	{
+		NotificationFramework = 
+		{
+			createNotify = nil; 
+			Notifications = {};
+		};
+		HubFramework = 
+		{
+
+		}
+	}
+
+local hubFramework = CHLXBuilder.HubFramework
+local notifFramework = CHLXBuilder.NotificationFramework
+local Notifications = notifFramework.Notifications
+
+local NFFrameDef = {};
+local notifDef = {};
+
+NFFrameDef.__index = NFFrameDef
+notifDef.__index = notifDef
 
 function createNotify()
 	local NF_Example = Instance.new("Frame")
@@ -144,8 +181,9 @@ function createNotify()
 
 	NF_Example.Name = randomstring()
 	NF_Example.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-	NF_Example.Position = UDim2.new(0, 0, 0.6875, 0)
+	NF_Example.Position = UDim2.new(0, 0, 0, 0)
 	NF_Example.Size = UDim2.new(0, 320, 0, 100)
+	NF_Example.AnchorPoint = Vector2.new(0.5, 0.5)
 
 	NFE_UICorner.CornerRadius = UDim.new(0, 5)
 	NFE_UICorner.Parent = NF_Example
@@ -202,38 +240,63 @@ function createNotify()
 	NFE_Text.TextXAlignment = Enum.TextXAlignment.Left
 	NFE_Text.TextYAlignment = Enum.TextYAlignment.Top
 
-	return {Base = NF_Example; Name = NFE_name; CloseButton = NFE_Close; Notif = NFE_Text; PBar = NFE_PBar}
+	return
+		{
+			Base = NF_Example;
+			Name = NFE_name;
+			CloseButton = NFE_Close; 
+			Notif = NFE_Text; 
+			PBar = NFE_PBar
+		}
 end
 
-function notifFramework.notify(notif, debounce)
-	notif = tostring(notif)
-	if debounce == nil then
-		debounce = 5
+function NFFrameDef:Repositon()
+	for i,v in pairs(Notifications) do
+		if v.Closing == false then
+			local pos = v:gPosition()
+			local daTween = createTween(v.Base, 0.1, "In", "Sine", {Position = pos})
+			daTween:Play()
+			daTween.Completed:Wait()
+		end
 	end
-	local Notification = createNotify()
+end
 
-	Notification.Base.Parent = NotificationHolder
-	Notification.Notif.Text = notif or "Sample Text"
-	table.insert(Notifications, Notification.Base)
+function NFFrameDef:Notify(text, duration)
+	if self.createNotify == nil then
+		return
+	end
 
-	local pos = notifFramework.calculateNotifyPos(Notification.Base, 0.15)
+	text = tostring(text)
+	if duration == nil then
+		duration = 5
+	end
+	local Notification = self.createNotify()
+
+	Notification.Closing = false;
+
+	setmetatable(Notification, notifDef)
+	
+	Notification.Base.Parent = self.GUI
+	Notification.Notif.Text = text or "Sample Text"
+
+	table.insert(Notifications, Notification)
+	
+	local pos = Notification:gPosition()
+
 	Notification.Base.Position = UDim2.new(1, 0, pos.Y.Scale, 0)
 
-	local function closeNotify()
-		local closeTween = createTween(Notification.Base, 0.1, "In", "Sine", {Position = UDim2.new(1, 0, Notification.Base.Position.Y.Scale, 0)})
-		closeTween:Play()
-		closeTween.Completed:Wait()
-		Notification.Base:Destroy()
-	end
-
 	if Notification.CloseButton ~= nil then
-		Notification.CloseButton.MouseButton1Down:Connect(closeNotify)
+		Notification.CloseButton.MouseButton1Down:Connect(function()
+			Notification:Close()
+		end)
 	end
 
 	if Notification.PBar ~= nil then
-		local runner = createTween(Notification.PBar, debounce, "In", "Linear", {Size = UDim2.new(0,0,0,3)})
+		local runner = createTween(Notification.PBar, duration, "In", "Linear", {Size = UDim2.new(0, 0, 0, 3)})
 		runner:Play()
-		runner.Completed:Connect(closeNotify)
+		runner.Completed:Connect(function()
+			Notification:Close()
+		end)
 	end
 
 	local openTween = createTween(Notification.Base, 0.1, "In", "Sine", {Position = pos})
@@ -241,90 +304,60 @@ function notifFramework.notify(notif, debounce)
 	openTween.Completed:Wait()
 end
 
-NotificationHolder.ChildRemoved:Connect(function(child)
-	local index = table.find(Notifications, child)
-	if index ~= nil then
-		table.remove(Notifications, index)
-		notifFramework.notifyRepositon()
+notifFramework.Initialize = function()
+	local NF_GUI = Instance.new("ScreenGui")
+
+	NF_GUI.Name = randomstring()
+	NF_GUI.Parent = coreGui
+	NF_GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	NF_GUI.ResetOnSpawn = false
+
+	protectGui(NF_GUI)
+
+	local toReturn = {GUI = NF_GUI}
+
+	setmetatable(toReturn, NFFrameDef)
+
+	NF_GUI.ChildRemoved:Connect(function(child)
+		for i,v in pairs(Notifications) do
+			if v.Base == child then
+				table.remove(Notifications, i)
+				toReturn:Repositon()
+			end
+		end
+	end)
+
+	return toReturn
+end
+
+function notifDef:Close()
+	local closeTween = createTween(self.Base, 0.1, "In", "Sine", {Position = UDim2.new(1, 0, self.Base.Position.Y.Scale, 0)})
+	closeTween:Play()
+	closeTween.Completed:Wait()
+	self.Base:Destroy()
+end
+
+function notifDef:gPosition()
+	local index = nil
+	
+	for i,v in pairs(Notifications) do
+		if v.Base == self.Base then
+			index = i
+			break
+		end
 	end
-end)
+	
+	if index == 1 then
+		return UDim2.new(0.9, 0, 0.9, 0)
+	end
+	if index > 1 then
+		local posYScale = Notifications[index-1].Base.Position.Y.Scale - tonumber("0."..Notifications[index-1].Base.Size.Y.Offset)
+		return UDim2.new(0.9, 0, posYScale, 0)
+	end
+end
 
--- hub loader
-local LO_GUI = Instance.new("ScreenGui")
-local LO_Base = Instance.new("Frame")
-local LO_UICorner = Instance.new("UICorner")
-local LO_HubName = Instance.new("TextLabel")
-local LO_LoadHolder = Instance.new("Frame")
-local LO_Runner = Instance.new("Frame")
-local LO_UIListLayout = Instance.new("UIListLayout")
-local LO_UIPadding = Instance.new("UIPadding")
-
-LO_GUI.Name = randomstring()
-LO_GUI.Parent = coreGui
-LO_GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-LO_GUI.ResetOnSpawn = false
-
-LO_Base.Name = randomstring()
-LO_Base.Parent = LO_GUI
-LO_Base.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-LO_Base.Position = UDim2.new(0.430789351, 0, 0.898664355, 0)
-LO_Base.Size = UDim2.new(0, 250, 0, 40)
-
-LO_UICorner.CornerRadius = UDim.new(0, 3)
-LO_UICorner.Parent = LO_Base
-
-LO_HubName.Name = randomstring()
-LO_HubName.Parent = LO_Base
-LO_HubName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-LO_HubName.BackgroundTransparency = 1.000
-LO_HubName.BorderSizePixel = 2
-LO_HubName.Position = UDim2.new(0.0200959481, 0, 0, 0)
-LO_HubName.Size = UDim2.new(0, 238, 0, 16)
-LO_HubName.Font = Enum.Font.SourceSansBold
-LO_HubName.Text = "CHLENIX"
-LO_HubName.TextColor3 = Color3.fromRGB(255, 255, 255)
-LO_HubName.TextSize = 14.000
-LO_HubName.TextXAlignment = Enum.TextXAlignment.Left
-LO_HubName.LayoutOrder = 1
-
-LO_LoadHolder.Name = randomstring()
-LO_LoadHolder.Parent = LO_Base
-LO_LoadHolder.BackgroundColor3 = Color3.fromRGB(168, 17, 255)
-LO_LoadHolder.BorderSizePixel = 0
-LO_LoadHolder.ClipsDescendants = true
-LO_LoadHolder.Position = UDim2.new(0.0240000002, 0, 0.400000006, 0)
-LO_LoadHolder.Size = UDim2.new(0, 238, 0, 17)
-LO_LoadHolder.LayoutOrder = 2
-
-LO_Runner.Name = randomstring()
-LO_Runner.Parent = LO_LoadHolder
-LO_Runner.BackgroundColor3 = Color3.fromRGB(104, 11, 158)
-LO_Runner.BorderSizePixel = 0
-LO_Runner.Size = UDim2.new(0, 60, 0, 17)
-LO_Runner.ZIndex = 3
-
-LO_UIListLayout.Parent = LO_Base
-LO_UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-LO_UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
-LO_UIPadding.Parent = LO_Base
-LO_UIPadding.PaddingBottom = UDim.new(0, 5)
-LO_UIPadding.PaddingLeft = UDim.new(0, 5)
-LO_UIPadding.PaddingRight = UDim.new(0, 5)
-
-protectGui(LO_GUI)
-
-local LO_Debounce = 0
-coroutine.resume(coroutine.create(function()
-	repeat
-		LO_Runner.Position = UDim2.new(-0.252, 0, 0, 0)
-		local daTween = createTween(LO_Runner, .7, "In", "Linear", {Position = UDim2.new(1, 0, 0, 0)})
-		daTween:Play()
-		daTween.Completed:Wait()
-		LO_Debounce = LO_Debounce + 1
-	until LO_Debounce == 3 and isLoaded == true --LO_Debounce == 6
-	createTween(LO_Base, .1, "In", "Linear", {Position = UDim2.new(0.43, 0, 1, 0), Transparency = 1}):Play()
-end))
+local notifFr = notifFramework.Initialize(createNotify)
+notifFr.createNotify = createNotify
 
 local hubDef = {}
 local pageDef = {}
@@ -345,7 +378,7 @@ checkboxDef.__index = checkboxDef
 textboxDef.__index = textboxDef
 dropdownOptionDef.__index = dropdownOptionDef
 
-function CHLXBuilder.createHub()
+function hubFramework.Initialize()
 	local HUB_GUI = Instance.new("ScreenGui")
 	local HUB_Header = Instance.new("Frame")
 	local HUB_Base = Instance.new("Frame")
@@ -699,6 +732,7 @@ function CHLXBuilder.createHub()
 	local toReturn = {
 		-- Variables
 		CurrentlyOpenPage = PAGES_HomePage;
+		Active = true;
 		-- Interface
 		GUI = HUB_GUI;
 		Header = HUB_Header;
@@ -725,14 +759,10 @@ function CHLXBuilder.createHub()
 	}
 
 	setmetatable(toReturn, hubDef)
-	
-	toReturn:newContextMenuButton("HM").MouseButton1Down:connect(function()
-		toReturn:SwitchPage({Base = PAGES_HomePage})
-	end)
-	toReturn:newContextMenuButton("GM").MouseButton1Down:connect(function()
-		toReturn:SwitchPage({Base = PAGES_SupportedGames})
-	end)
-	
+
+	toReturn:newContextMenuButton("HM").MouseButton1Down:connect(toReturn:switchPage({Base = PAGES_HomePage}))
+	toReturn:newContextMenuButton("GM").MouseButton1Down:connect(toReturn:switchPage({Base = PAGES_SupportedGames}))
+
 	return toReturn
 end
 
@@ -801,14 +831,18 @@ function hubDef:newPage()
 
 	EX_Page.Parent = self.Pages
 
-	local toReturnPage = {Base = EX_Page; Hub = self}
+	local toReturnPage = 
+		{
+			Base = EX_Page;
+			Hub = self
+		}
 
 	setmetatable(toReturnPage, pageDef)
 
 	return toReturnPage
 end
 
-function hubDef:SwitchPage(page)
+function hubDef:switchPage(page)
 	self.CurrentlyOpenPage.Visible = false
 	page.Base.Visible = true
 	self.CurrentlyOpenPage = page.Base
@@ -822,13 +856,48 @@ function hubDef:toggleShadow()
 	createTween(self.Shadow, 0.08, "In", "Linear", {Transparency = tParency}):Play()
 end
 
-function hubDef:SummonDropdown(dropName, dropOptions, optionHolder)
+function hubDef:toggleWindow(skipAnim)
+	local t1 = 0.3
+	local t2 = 0.2
+
+	local s1 = UDim2.new(0, 600, 0, 20)
+	local s2 = UDim2.new(0, 600, 0, 300)
+
+	if skipAnim == true then
+		t1 = 0
+		t2 = 0
+	end
+
+	if self.Active == true then
+		self.Active = false
+		s1 = UDim2.new(0, 0, 0, 20)
+		s2 = UDim2.new(0, 600, 0, 0)
+		local animn2 = createTween(self.Base, t2, "In", "Quad", {Size = s2})
+		animn2:Play()
+		animn2.Completed:Wait()
+		local animn = createTween(self.Header, t1, "InOut", "Quad", {Size  = s1})
+		animn:Play()
+		animn.Completed:Wait()
+		self.Header.Visible = false
+		return
+	end
+	self.Active = true
+	self.Header.Visible = true
+	local animn = createTween(self.Header, t1, "InOut", "Quad", {Size  = s1})
+	animn:Play()
+	animn.Completed:Wait()
+	local animn2 = createTween(self.Base, t2, "In", "Quad", {Size = s2})
+	animn2:Play()
+	animn2.Completed:Wait()
+end
+
+function hubDef:SummonDropdown(dropSetting)
 	for i,v in pairs(self.PUD_Holder:GetChildren()) do
 		if v:IsA("GuiButton") then
 			v:Destroy()
 		end
 	end
-	for i,v in pairs(dropOptions) do
+	for i,v in pairs(dropSetting.DropOptions) do
 		local EX_DropOption = Instance.new("TextButton")
 
 		EX_DropOption.Name = randomstring()
@@ -842,16 +911,16 @@ function hubDef:SummonDropdown(dropName, dropOptions, optionHolder)
 		EX_DropOption.Text = v.optionName
 		EX_DropOption.Parent = self.PUD_Holder
 		EX_DropOption.MouseButton1Down:Connect(function()
-			if optionHolder ~= nil then
-				optionHolder.Text = v.optionName
+			if dropSetting.QuickFire ~= nil then
+				dropSetting.SelectedOption = v
+				dropSetting.QuickFire.Text = v.optionName
 			end
 			v.func()
-			return v
 		end)
 	end
 	self.PopUpDropdown.Visible = true
 	self:toggleShadow()
-	self.PUD_Header.Text = dropName
+	self.PUD_Header.Text = dropSetting.DropName.Text
 	self.PUD_HEADER_Close.MouseButton1Down:Connect(function()
 		self:toggleShadow()
 		self.PopUpDropdown.Visible = false
@@ -913,7 +982,19 @@ function pageDef:newCategory(categoryName)
 	EX_CategoryName.Parent = self.Base
 	EX_Category.Parent = self.Base
 
-	local toReturnCategory = {NameLabel = EX_CategoryName; Base = EX_Category; Page = self}
+	local toReturnCategory = 
+		{
+			NameLabel = EX_CategoryName;
+			Base = EX_Category;
+			Page = self;
+			Objects = 
+			{
+				Checkboxes = {};
+				OneTimePressButtons = {};
+				Textboxes = {};
+				Dropdowns = {};
+			};
+		}
 
 	setmetatable(toReturnCategory, categoryDef)
 
@@ -1044,6 +1125,8 @@ function categoryDef:newCheckbox(checkName)
 
 	setmetatable(theCheckbox, checkboxDef)
 
+	table.insert(self.Objects.Checkboxes, theCheckbox)
+
 	return theCheckbox
 end
 
@@ -1113,6 +1196,8 @@ function categoryDef:newTextbox(textBoxName)
 
 	setmetatable(toReturnTextBox, textboxDef)
 
+	table.insert(self.Objects.Textboxes, toReturnTextBox)
+
 	return toReturnTextBox
 end
 
@@ -1138,6 +1223,8 @@ function categoryDef:newOneTimePressButton(buttonName)
 	OneTimePress.Text = buttonName or "N/A"
 
 	OneTimePress.Parent = self.Base
+
+	table.insert(self.Objects.OneTimePressButtons, OneTimePress)
 
 	return OneTimePress
 end
@@ -1215,29 +1302,23 @@ function categoryDef:newDropdown(dropdownName)
 		QuickFire = option;
 		SelectedOption = nil;
 		DropOptions = {};
-		SummonFunc = 1;
 		Category = self;
 	}
-	
+
 	setmetatable(toReturnDropdown, dropdownDef)
-	
+
+	table.insert(self.Objects.Dropdowns, toReturnDropdown)
+
 	EX_Dropdown.Parent = self.Base
 
 	option.MouseButton1Down:Connect(function()
-		local opt = toReturnDropdown:FindOption(option.Text)
-		if opt ~= nil then
-			opt.Option.func()
+		if toReturnDropdown.SelectedOption ~= nil then
+			toReturnDropdown.SelectedOption.func()
 		end
-		--if toReturnDropdown.SelectedOption ~= nil then
-			--toReturnDropdown.SelectedOption.func()
-			--return
-		--end
 	end)
 
 	Dropit.MouseButton1Down:Connect(function()
-		if toReturnDropdown.SummonFunc ~= nil then
-			self:GetPage():GetHub():SummonDropdown(dropdownName, toReturnDropdown.DropOptions, option)
-		end
+		self:GetPage():GetHub():SummonDropdown(toReturnDropdown)
 	end)
 
 	return toReturnDropdown
@@ -1246,6 +1327,7 @@ end
 function categoryDef:Destroy()
 	self.NameLabel:Destroy()
 	self.Base:Destroy()
+	self.Objects = nil
 end
 
 function categoryDef:GetPage()
@@ -1255,6 +1337,7 @@ end
 -- Dropdown Functions
 function dropdownDef:Destroy()
 	self.Base:Destroy()
+	table.remove(self.Category.Objects.Dropdowns, table.find(self.Category.Objects.Dropdowns, self))
 end
 
 function dropdownDef:AddOption(optionName, func)
@@ -1271,7 +1354,7 @@ function dropdownDef:AddOption(optionName, func)
 	return {Option = self.DropOptions[index]; Index = index;}
 end
 
-function dropdownDef:FindOption(name)
+function dropdownDef:GetOption(name)
 	for i,v in pairs(self.DropOptions) do
 		if v.optionName == name then
 			return {Option = v; Index = i}
@@ -1281,7 +1364,7 @@ function dropdownDef:FindOption(name)
 end
 
 function dropdownDef:RemoveOption(option)
-	local check = self:FindOption(option)
+	local check = self:GetOption(option)
 	if check ~= nil then
 		table.remove(self.DropOptions, check.Index)
 	end
@@ -1296,6 +1379,7 @@ end
 -- Textbox Functions
 function textboxDef:Destroy()
 	self.Base:Destroy()
+	table.remove(self.Category.Objects.Textboxes, table.find(self.Category.Objects.Textboxes, self))
 end
 
 function textboxDef:GetText()
@@ -1308,41 +1392,14 @@ end
 -- Checkbox Functions
 function checkboxDef:Destroy()
 	self.Base:Destroy()
+	table.remove(self.Category.Objects.Checkboxes, table.find(self.Category.Objects.Checkboxes, self))
 end
 
 -- Hub Creation
-local hubMain = CHLXBuilder.createHub()
---[[
-local testPage = hubMain:newPage()
-local trashCategory = testPage:newCategory("trash")
-local contxBut = hubMain:newContextMenuButton("F")
-contxBut.MouseButton1Down:Connect(function()hubMain:SwitchPage(testPage)end)
-local chkbx = trashCategory:newCheckbox("do the thing")
-
-chkbx:Connect(function()
-	print(chkbx.Checked)
-end)
-
-local otp = trashCategory:newOneTimePressButton("void")
-otp.MouseButton1Down:Connect(function()
-	print("x")
-end)
-local tbox = trashCategory:newTextbox("nothin", "nd")
-tbox.func = function(input)
-	print(tbox:GetText())
-end
-local dropus = trashCategory:newDropdown("dropus")
-dropus.summonFunc = hubMain
-local a1 = dropus:AddOption("trash", function()
-	print("fired")
-end)]]
-
+local hubMain = hubFramework.Initialize()
 -- universal
-
 local unvPage = hubMain:newPage()
-hubMain:newContextMenuButton("UNV").MouseButton1Down:Connect(function()
-	hubMain:SwitchPage(unvPage)
-end)
+hubMain:newContextMenuButton("UNV").MouseButton1Down:Connect(hubMain:switchPage(unvPage))
 local characterCat = unvPage:newCategory("Character")
 local cWSB = characterCat:newCheckbox("WalkSpeed Enabled")
 local cJPB = characterCat:newCheckbox("JumpPower Enabled")
@@ -1381,8 +1438,8 @@ cWSB.OnUnCheckFunc = function()
 end
 
 cJPB.OnCheckFunc = function()
-	oldJumpPower = humanoid.JumpPower
 	coroutine.resume(coroutine.create(function()
+		oldJumpPower = humanoid.JumpPower
 		while cJPB.Checked == true do
 			humanoid.JumpPower = jumpChange:GetText()
 			wait()
@@ -1422,18 +1479,14 @@ if game.PlaceId == 537413528 then
 	local function destroyGlue(plr)
 		for i,v in pairs(workspace:GetChildren()) do
 			if v.Name == "Glue" and v:IsA("Model") and v:FindFirstChildWhichIsA("ClickDetector") and (plr == true or playersService:FindFirstChild(v.Tag.Value) == plr) then
-				--if playersService:FindFirstChild(v.Tag.Value) == plr or plr == true then
 				fireClickDetector(v.ClickDetector)
-				--end
 			end
 		end
 	end
 
 	local page = hubMain:newPage()
 	local contxb = hubMain:newContextMenuButton("BBFT")
-	contxb.MouseButton1Down:Connect(function()
-		hubMain:SwitchPage(page)
-	end)
+	contxb.MouseButton1Down:Connect(hubMain:switchPage(page))
 	-- General
 	local generalCategory = page:newCategory("General")
 	local noglue = generalCategory:newDropdown("Destroy glue")
@@ -1460,7 +1513,7 @@ if game.PlaceId == 537413528 then
 	end)
 
 	antiIsolation.MouseButton1Down:Connect(function()
-		notifFramework.notify("Removed all currently existing Isolation Mode boundaries. Click again to remove new ones", 5)
+		notifFr:Notify("Removed all currently existing Isolation Mode boundaries. Click again to remove new ones", 5)
 		for i,v in pairs(teamZones) do
 			if v:FindFirstChild("Lock") and v.Lock:FindFirstChild("Part") then
 				v.Lock.Part:Destroy()
@@ -1493,11 +1546,28 @@ if game.PlaceId == 537413528 then
 	end
 
 	aFCB.OnCheckFunc = function()
-		notifFramework.notify("Autofarm started", 3)
+		notifFr:Notify("Autofarm started", 3)
 
 		local moneyBefore = localPlayer.Data.Gold.Value
 		local cycleCount = 0
-
+		
+		local GC = getconnections or get_signal_cons
+		if GC then
+			for i,v in pairs(GC(localPlayer.Idled)) do
+				if v["Disable"] then
+					v["Disable"](v)
+				elseif v["Disconnect"] then
+					v["Disconnect"](v)
+				end
+			end
+		else
+			localPlayer.Idled:Connect(function()
+				local VirtualUser = game:GetService("VirtualUser")
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton2(Vector2.new())
+			end)
+		end
+		
 		local function repeatProcces()
 			character:WaitForChild("HumanoidRootPart")
 
@@ -1514,20 +1584,20 @@ if game.PlaceId == 537413528 then
 
 			character.AncestryChanged:connect(function(Self, newParent)
 				if newParent ~= workspace then
-					notifFramework.notify("[AF]: Cycle Error, character.Parent ~= workspace", 3)
+					notifFr:Notify("[AF]: Cycle Error, character.Parent ~= workspace", 3)
 					autoFarmWorks = false
 				end
 			end)
 
 			character.ChildRemoved:connect(function(v)
 				if v == humanoidRootPart or v == humanoid then
-					notifFramework.notify("[AF]: Cycle Error, humanoid or humanoidRootPart removed", 3)
+					notifFr:Notify("[AF]: Cycle Error, humanoid or humanoidRootPart removed", 3)
 					autoFarmWorks = false
 				end
 			end)
 
 			humanoid.Died:connect(function()
-				notifFramework.notify("[AF]: Cycle Error, humanoid died", 3)
+				notifFr:Notify("[AF]: Cycle Error, humanoid died", 3)
 				autoFarmWorks = false
 			end)
 
@@ -1537,7 +1607,7 @@ if game.PlaceId == 537413528 then
 				["Gold"] = function()
 					for i,v in pairs(toTouch) do
 						if autoFarmWorks == false then
-							notifFramework.notify("[AF]: Cycle Break", 3)
+							notifFr:Notify("[AF]: Cycle Break", 3)
 							break
 						end
 						createTween(humanoidRootPart, delayTB:GetText(), Enum.EasingDirection.In, Enum.EasingStyle.Linear, {CFrame = v.CFrame}):Play()
@@ -1553,14 +1623,14 @@ if game.PlaceId == 537413528 then
 					wait(timeNeededToOpenChest + 1)
 
 					if localPlayer.Character == AFcharacter then
-						notifFramework.notify("[AF]: Cycle Error, the chest wasn't opening for too much", 3)
+						notifFr:Notify("[AF]: Cycle Error, the chest wasn't opening for too much", 3)
 						localPlayer.Character:BreakJoints()
 					end
 				end;
 				["GBlocks"] = function()
 					for i = 1, 3, 1 do
 						if autoFarmWorks == false then
-							notifFramework.notify("[AF]: Cycle Break", 3)
+							notifFr:Notify("[AF]: Cycle Break", 3)
 							break
 						end
 						createTween(humanoidRootPart, delayTB:GetText(), Enum.EasingDirection.In, Enum.EasingStyle.Linear, {CFrame = toTouch[i].CFrame}):Play()
@@ -1576,7 +1646,7 @@ if game.PlaceId == 537413528 then
 					wait(timeNeededToOpenChest + 1)
 
 					if localPlayer.Character == AFcharacter then
-						notifFramework.notify("[AF]: Cycle Error, the chest wasn't opening for too much", 3)
+						notifFr:Notify("[AF]: Cycle Error, the chest wasn't opening for too much", 3)
 						localPlayer.Character:BreakJoints()
 					end
 				end
@@ -1591,7 +1661,7 @@ if game.PlaceId == 537413528 then
 		local autoFarmCheck = nil
 		autoFarmCheck = localPlayer.CharacterAdded:connect(function()
 			if aFCB.Checked == false then
-				notifFramework.notify("Earned " .. localPlayer.Data.Gold.Value - moneyBefore .. " in ".. cycleCount .. " cycles. Took ".. cycleCount * (timeNeededToOpenChest + 1 + delayTB:GetText() * #toTouch) .. " seconds", 5)
+				notifFr:Notify("Earned " .. localPlayer.Data.Gold.Value - moneyBefore .. " in ".. cycleCount .. " cycles. Took ".. cycleCount * (timeNeededToOpenChest + 1 + delayTB:GetText() * #toTouch) .. " seconds", 5)
 				autoFarmCheck:Disconnect()
 				return
 			end
@@ -1609,9 +1679,7 @@ elseif game.PlaceId == 850917308 then
 	local page = hubMain:newPage()
 	local general = page:newCategory("General")
 	local contxb = hubMain:newContextMenuButton("LB2")
-	contxb.MouseButton1Down:Connect(function()
-		hubMain:SwitchPage(page)
-	end)
+	contxb.MouseButton1Down:Connect(hubMain:switchPage(page))
 	local medHeal = general:newCheckbox("Meditation Heal")
 	local antiFreezeCB = general:newCheckbox("Anti-Freeze")
 	local infiniteStaminaOTP = general:newOneTimePressButton("Infinite Stamina")
@@ -1726,7 +1794,6 @@ elseif game.PlaceId == 850917308 then
 	unlockForce.MouseButton1Down:Connect(function()
 		local a = playerGui.forcePowers.LocalScript
 		local b = getSenv(a)
-
 		local fenv = getfenv(b.frameSetup)
 		fenv.myLevel = 9e9
 		for idx,val in pairs(fenv.powerData) do
@@ -1811,8 +1878,7 @@ function getDate(str)
 	return sep2[3].."."..sep2[2].."."..sep2[1]
 end
 
-hubMain.Header.Size  = UDim2.new(0, 0, 0, 20)
-hubMain.Base.Size = UDim2.new(0, 600, 0, 0)
+hubMain:toggleWindow(true)
 
 local gH = {
 	{ 
@@ -1906,7 +1972,7 @@ pcall(function()
 end)
 
 if detectedGame == false then
-	notifFramework.notify("Unknown game!", 10)
+	notifFr:Notify("Unknown game!", 10)
 end
 
 -- Dragging
@@ -1953,23 +2019,47 @@ OBJ_Dragger(hubMain.Header)
 isLoaded = true
 
 -- Hub Open Animation
-local animn = createTween(hubMain.Header, .3, "InOut", "Quad", {Size  = UDim2.new(0, 600, 0, 20)})
-animn:Play()
-animn.Completed:Wait()
-local animn2 = createTween(hubMain.Base, .2, "In", "Quad", {Size = UDim2.new(0, 600, 0, 300)})
-animn2:Play()
-
+hubMain:toggleWindow()
 -- Hub Close
 
 userInputService.InputBegan:Connect(function(input, chatting)
 	if input.KeyCode == Enum.KeyCode.RightAlt and not chatting then
-		if hubMain.Header.Visible == false then
-			hubMain.Header.Visible = true
-			return
-		end
-		hubMain.Header.Visible = false
+		hubMain:toggleWindow(true)
 	end
 end)
+
+if CHLX_DEBUG == true then
+	local testPage = hubMain:newPage()
+	local trashCategory = testPage:newCategory("Test1")
+	local contxBut = hubMain:newContextMenuButton("</>")
+	contxBut.MouseButton1Down:Connect(hubMain:switchPage(testPage))
+	local chkbx = trashCategory:newCheckbox("Checkbox")
+
+	chkbx.OnCheckFunc = function()
+		notifFr:Notify(chkbx.Checked)
+	end
+
+	local otp = trashCategory:newOneTimePressButton("Test Notification")
+	otp.MouseButton1Down:Connect(function()
+		notifFr:Notify("Fired")
+	end)
+	
+	local tbox = trashCategory:newTextbox()
+	tbox.func = function(input)
+		notifFr:Notify(tbox:GetText())
+	end
+	
+	local dropus = trashCategory:newDropdown("dropus")
+	local a1 = dropus:AddOption("trash", function()
+		notifFr:Notify("1")
+	end)
+	local a2 = dropus:AddOption("hsart", function()
+		notifFr:Notify("2")
+	end)
+	local a3 = dropus:AddOption("_omg", function()
+		notifFr:Notify("3")
+	end)
+end
 
 -- Rebuilder
 localPlayer.CharacterAdded:Connect(function()
