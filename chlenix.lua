@@ -1708,6 +1708,7 @@ elseif game.PlaceId == 850917308 then
 	local updStance = Eventz.updateStance
 	local atkStart = Eventz.attackStart
 	local target = Lightsaber.combatData.Target
+	local targetS = 90
 	local saberClient = Lightsaber.Client
 	local forceClient = backPack.Force.Client
 	local sClientEnv = getSenv(saberClient)
@@ -1821,10 +1822,8 @@ elseif game.PlaceId == 850917308 then
 
 		if not checkCaller() and NamecallMethod == "FireServer" then
 			if Self == updStance and protectusBotusCB.Checked == true then
-				local tSab = target.Value.Lightsaber or target.Value["Dual Lightsabers"] or target.Value["Crossguard Lightsaber"] or target.Value.Darksaber
-				local degree = tSab.combatData.Stance.Value
 				local args = {
-					[1] = degree,
+					[1] = targetS,
 					[2] = false
 				}
 				return OldNameCall(Self,  unpack(args))
@@ -1868,6 +1867,11 @@ elseif game.PlaceId == 850917308 then
 
 	coroutine.resume(coroutine.create(function()
 		while wait() do
+			pcall(function()
+				local za = target.Value:FindFirstChild("Lightsaber") or target.Value:FindFirstChild("Dual Lightsabers") or target.Value:FindFirstChild("Crossguard Lightsaber") or target.Value.Darksaber
+				targetS = za.combatData.Stance.Value
+			end)
+			humanoid.Sit = false
 			humanoid.PlatformStand = false
 			if cWSB.Checked == false then
 				humanoid.WalkSpeed = oldSpeed
