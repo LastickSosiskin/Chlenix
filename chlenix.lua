@@ -1714,11 +1714,14 @@ elseif game.PlaceId == 850917308 then
 	local sClientEnv = getSenv(saberClient)
 	local fClientEnv = getSenv(forceClient)
 	-- Functions
+	local aFCon = nil
 	local function antiFreeze()
-		local con;
-		con = character.HumanoidRootPart.ChildAdded:connect(function(v)
+		if aFCon ~= nil then
+			aFCon:Disconnect()
+		end
+		aFCon = character.HumanoidRootPart.ChildAdded:connect(function(v)
 			if antiFreezeCB.Checked == false then
-				con:Disconnect()
+				aFCon:Disconnect()
 				return
 			end
 			if v:IsA('BodyGyro') and v.Name == "FakeBPVelocity" then
@@ -1800,7 +1803,7 @@ elseif game.PlaceId == 850917308 then
 		tHeal:FireServer(unpack(args))
 	end
 
-	antiFreezeCB:Connect(antiFreeze)
+	antiFreezeCB.OnCheckFunc = antiFreeze
 
 	unlockForce.MouseButton1Down:Connect(function()
 		local a = playerGui.forcePowers.LocalScript
