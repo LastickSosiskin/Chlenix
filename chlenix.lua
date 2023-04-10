@@ -141,7 +141,7 @@ coroutine.resume(coroutine.create(function()
 		daTween:Play()
 		daTween.Completed:Wait()
 		LO_Debounce = LO_Debounce + 1
-	until LO_Debounce == 3 and isLoaded == true
+	until LO_Debounce >= 3 and isLoaded == true
 	createTween(LO_Base, .1, "In", "Sine", {Position = UDim2.new(0.5, 0, 1.1, 0), Transparency = 1}):Play()
 	wait(.1)
 	LO_GUI:Destroy()
