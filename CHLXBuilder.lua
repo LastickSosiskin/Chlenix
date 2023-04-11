@@ -722,10 +722,11 @@ function notifDef:gPosition()
 			break
 		end
 	end
-
 	--local posYScale = Notifications[index-1].Base.Position.Y.Scale - tonumber("0."..Notifications[index-1].Base.Size.Y.Offset)
-	local experimental = 1 - self.Base.Size.Y.Offset * index / 10 / 10 / 10
-	return UDim2.new(experimental, 0, experimental, 0)
+	local experimentalX = 1 - self.Base.Size.Y.Offset / 10 / 10 / 10
+	local experimentalY = 1 - self.Base.Size.Y.Offset * index / 10 / 10 / 10
+	
+	return UDim2.new(experimentalX, 0, experimentalY, 0)
 end
 function notifDef:Close()
 	local closeTween = createTween(self.Base, 0.1, "In", "Sine", {Position = UDim2.new(1, 0, self.Base.Position.Y.Scale, 0)})
@@ -943,7 +944,7 @@ function hubDef:SummonDropdown(dropSetting)
 		self:toggleShadow()
 		self.PopUpDropdown.Visible = false
 	end)
-	self.PUD_Search:GetPropertyChangedSignal("Text"):Connect(function() --вообще должен был быть getattribute changed signal, но он чё то не работает
+	self.PUD_Search:GetPropertyChangedSignal("Text"):Connect(function()
 		for i,v in pairs(self.PUD_Holder:GetChildren()) do
 			if v:IsA("GuiButton") then
 				local sText = self.PUD_Search.Text:lower	()
