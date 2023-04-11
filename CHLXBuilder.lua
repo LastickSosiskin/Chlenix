@@ -651,7 +651,7 @@ notifFramework.Initialize = function()
 		for i,v in pairs(Notifications) do
 			if v.Base == child then
 				table.remove(Notifications, i)
-				toReturn:Repositon()
+				toReturn:Reposition()
 			end
 		end
 	end)
@@ -664,9 +664,11 @@ function NFFrameDef:Notify(text, duration)
 	end
 
 	text = tostring(text)
+	
 	if duration == nil then
 		duration = 5
 	end
+	
 	local Notification = self.createNotify()
 
 	Notification.Closing = false;
@@ -700,7 +702,7 @@ function NFFrameDef:Notify(text, duration)
 	openTween:Play()
 	openTween.Completed:Wait()
 end
-function NFFrameDef:Repositon()
+function NFFrameDef:Reposition()
 	for i,v in pairs(Notifications) do
 		if v.Closing == false then
 			local pos = v:gPosition()
@@ -721,15 +723,9 @@ function notifDef:gPosition()
 		end
 	end
 
-	if index == 1 then
-		local experimental = 1 - self.Base.Size.Y.Offset / 10 / 10 / 10
-		return UDim2.new(experimental, 0, experimental, 0) --(0.9, 0, 0.9, 0)
-	end
-	if index > 1 then
-		--local posYScale = Notifications[index-1].Base.Position.Y.Scale - tonumber("0."..Notifications[index-1].Base.Size.Y.Offset)
-		local experimental = 1 - self.Base.Size.Y.Offset * index / 10 / 10 / 10
-		return UDim2.new(0.9, 0, experimental, 0)
-	end
+	--local posYScale = Notifications[index-1].Base.Position.Y.Scale - tonumber("0."..Notifications[index-1].Base.Size.Y.Offset)
+	local experimental = 1 - self.Base.Size.Y.Offset * index / 10 / 10 / 10
+	return UDim2.new(experimental, 0, experimental, 0)
 end
 function notifDef:Close()
 	local closeTween = createTween(self.Base, 0.1, "In", "Sine", {Position = UDim2.new(1, 0, self.Base.Position.Y.Scale, 0)})
@@ -764,14 +760,14 @@ function hubFramework.Initialize()
 	local main = interfaceLib.createMainGUI()
 
 	setmetatable(main, hubDef)
-	
+
 	main:newContextMenuButton("HM").MouseButton1Down:connect(function()
 		main:switchPage({Base = main.HomePage})
 	end)
 	main:newContextMenuButton("GM").MouseButton1Down:connect(function()
 		main:switchPage({Base = main.SupportedGames})
 	end)
-	
+
 	return main
 end
 
@@ -852,7 +848,13 @@ function hubDef:newPage()
 			Base = EX_Page;
 			Hub = self;
 		}
-
+	
+	function toReturnPage.switchTo()
+		self.CurrentlyOpenPage.Visible = false
+		EX_Page.Base.Visible = true
+		self.CurrentlyOpenPage = EX_Page
+	end
+	
 	setmetatable(toReturnPage, pageDef)
 
 	return toReturnPage
@@ -1031,7 +1033,7 @@ end
 function categoryDef:newZone()
 	local Zone = Instance.new("Frame")
 	local UIListLayout = Instance.new("UIListLayout")
-	
+
 	Zone.AutomaticSize = Enum.AutomaticSize.X
 	Zone.Name = randomstring()
 	Zone.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1043,18 +1045,18 @@ function categoryDef:newZone()
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 	UIListLayout.Padding = UDim.new(0, 5)
-	
+
 	Zone.Parent = self.Base
-	
+
 	local toReturn = 
 		{
 			Base = Zone;
 			Objects = {};
 			Category = self;
 		}
-	
+
 	setmetatable(toReturn, zoneDef)
-	
+
 	return toReturn
 end
 
