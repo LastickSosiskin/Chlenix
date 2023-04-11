@@ -851,7 +851,7 @@ function hubDef:newPage()
 	
 	function toReturnPage.switchTo()
 		self.CurrentlyOpenPage.Visible = false
-		EX_Page.Base.Visible = true
+		EX_Page.Visible = true
 		self.CurrentlyOpenPage = EX_Page
 	end
 	
